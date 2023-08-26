@@ -1,0 +1,55 @@
+
+rm(list=ls())
+
+# set wd
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+setwd("../")
+
+# library
+library(vegan)
+library(FactoMineR)
+library(lavaan)
+library(data.table)
+library(MASS)
+
+
+all = read.csv("../2.DX2013_145sites/data/micro.rich.inter.biomass.combine.csv", row.names = 1)
+colnames(all)
+
+fit <- lm(Micro.mass ~ Micro.net + pre.AI + Micro.rich,
+          data=all)
+
+summary(fit)
+
+plot(all$Micro.rich, all$Micro.mass)
+plot(all$Micro.net, all$Micro.mass)
+
+
+# aridity < 0.78
+
+all.below = subset(all, Elevation >= 4700)
+
+
+fit.low <- lm(Micro.mass ~ Micro.net + pre.AI + Micro.rich,
+              data=all.below)
+
+summary(fit.low)
+
+plot(all.below$Micro.rich, all.below$Micro.mass)
+plot(all.below$Micro.net, all.below$Micro.mass)
+
+
+
+# aridity >= 0.78
+all.high = subset(all, Elevation < 4700)
+
+fit.high <- lm(Micro.mass ~ Micro.net + pre.AI + Micro.rich,
+               data=all.high)
+
+summary(fit.high)
+
+plot(all.high$Micro.rich, all.high$Micro.mass)
+plot(all.high$Micro.net, all.high$Micro.mass)
+
+
+
