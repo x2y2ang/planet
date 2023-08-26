@@ -1,0 +1,197 @@
+
+rm(list=ls())
+
+# set wd
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+setwd("../")
+
+
+# library
+library(vegan)
+library(ggplot2)
+library(RColorBrewer)
+library(reshape2)
+library(MASS)
+
+
+PV.all = read.csv("../2.DX2013_145sites/data/69.7.DX1314.cv.asy.pv.rep.all.5000times.csv",
+                  row.names = 1)
+PV.all.tmp = PV.all[, 2:5]
+
+PV.all.tmp[is.na(PV.all.tmp)] <- 0
+
+# 假设你的数据框为df，包含5万行数据
+# 使用数据切片计算前500行的平均值
+n <- 500
+
+for (i in seq(1, nrow(PV.all.tmp), n)) {
+  row_range <- i:min(i + n - 1, nrow(PV.all.tmp))
+  tmp <- PV.all.tmp[row_range, ]
+  col_mean = apply(tmp, 2, mean)
+  if (i==1)
+  {
+    mean500 = col_mean
+  }
+  else{
+    mean500 = rbind(mean500, col_mean)
+  }
+}
+
+# 输出计算结果
+Group = data.frame(c(rep("Plant.rich", 90), rep("Micro.rich", 100), 
+                     rep("EMF", 100), rep("AGB", 100),
+                     rep("PLFA", 100), rep("Soil.pca1", 100)))
+
+cv.asy.pv.mean = cbind(Group, mean500)
+colnames(cv.asy.pv.mean)[1] = c("Group")
+
+
+cv.asy.pv.all1.me = melt(cv.asy.pv.mean, id = c("Group", "ele.tmp"))
+
+cv.asy.pv.all1.me2 = subset(cv.asy.pv.all1.me, variable == "pv_values")
+
+cv.asy.pv.all1.me2$ele.tmp = factor(cv.asy.pv.all1.me2$ele.tmp)
+
+
+write.csv(cv.asy.pv.all1.me2, "../2.DX2013_145sites/data/70.1.DX1314.pv.rep5000times.mean500row.csv")
+
+
+ggplot(cv.asy.pv.all1.me2, aes(x=ele.tmp, y=value, color = ele.tmp))+ 
+  geom_point(size = 2)+
+  facet_wrap(variable ~ Group, scales="free_y", ncol=3)+
+  scale_colour_manual(values = c(brewer.pal(10,"Paired")))+
+  theme_bw()+ 
+  xlab("Elevation") + ylab("PV")+
+  theme(strip.background = element_blank()) +
+  theme(text = element_text(size = 12))+
+  theme( panel.grid.minor = element_blank(),
+         panel.grid.major = element_blank(),
+         axis.line = element_line(colour = "black"))+
+  theme(plot.title = element_text(hjust = 0.5,size = 12),
+        axis.text=element_text(size=12),
+        axis.title.x=element_text(size=12),
+        axis.title.y=element_text(size=12))+
+  theme(axis.text.x = element_text(hjust = 0.5, vjust = 0.5))+
+  theme(legend.position = 'none')
+
+
+#### DX1314.pv.rep5000times.mean500row ###
+PV.all.last = read.csv("../2.DX2013_145sites/data/70.1.DX1314.pv.rep5000times.mean500row.add.group.true.form.csv")
+colnames(PV.all.last)[1] = c("Elevation")
+
+lm_pvalue <- function (modelobject) {
+  if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+  f <- summary(modelobject)$fstatistic
+  p <- pf(f[1],f[2],f[3],lower.tail=F)
+  attributes(p) <- NULL
+  return(p)
+}
+
+gp <- unique(PV.all.last[,"gp"])
+length(gp)
+
+PV <- as.data.frame(PV.all.last[,c("value")])
+colnames(PV) <- c("PV")
+
+AI <- as.data.frame(PV.all.last[,c("AI")])
+
+
+for (i in 1:length(gp)){
+  gp.tmp <- gp[i]
+  gp.t <- PV[which(PV.all.last$gp == gp.tmp),]
+  gp.t = data.frame(gp.t)
+  
+  AI.t <- AI[which(PV.all.last$gp == gp.tmp),]
+  AI.t = data.frame(AI.t)
+  
+  
+  gp.AI.tmp = data.frame(gp.t = as.vector(gp.t),
+                         AI.t = as.vector(AI.t))
+  
+  lm.tmp = summary(lm(gp.t ~ AI.t, gp.AI.tmp))
+  
+  table.AI.tmp = data.frame(gp = gp[i],
+                            slope = lm.tmp$coefficients[2,1],
+                            Ine = lm.tmp$coefficients[1,1],
+                            p = lm.tmp$coefficients[2,4],
+                            r2 = lm.tmp$adj.r.squared)
+  if (i==1)
+  {
+    env.gp = table.AI.tmp
+  }
+  else{
+    env.gp = rbind(env.gp,table.AI.tmp)
+  }
+}
+
+
+lm.rich.all = env.gp
+# p.value > 0.05
+lm.rich.all$sig = ifelse(lm.rich.all$p > 0.05, "F","T")
+
+write.csv(lm.rich.all, "../2.DX2013_145sites/data/lm.p.value.scatter.dot.DX1314.pv.rep5000times.mean500row.csv")
+
+unique(PV.all.last$Group)
+var.list = c( "Plant.rich", "Micro.rich", "EMF",
+              "AGB", "PLFA", "Soil.pca1")
+PV.all.last$Group=factor(PV.all.last$Group,levels = var.list)
+PV.all.last=PV.all.last[order(PV.all.last$Group),]
+
+
+envi.lm.T <- lm.rich.all[lm.rich.all$sig=="T",]
+lm.t <- as.vector(envi.lm.T[,1])
+# choose linear lm P<0.05 in envi.tmp
+envi.lm.T1 = PV.all.last$gp %in% c(lm.t)
+
+envi.lm.F <- lm.rich.all[lm.rich.all$sig=="F",]
+lm.f <- as.vector(envi.lm.F[,1])
+# choose linear lm P<0.05 in envi.tmp
+envi.lm.F1 = PV.all.last$gp %in% c(lm.f)
+
+
+PV.all.last$Elevation = factor(PV.all.last$Elevation)
+
+
+ggplot(PV.all.last, aes(x=AI, y=value, color = Elevation))+ 
+  geom_point(size = 2, alpha = 0.8)+
+  stat_smooth(aes(colour=gp),method="lm",
+              formula=y~x,size=1, se = TRUE,
+              data = PV.all.last[envi.lm.T1,])+
+  # linear lm sig==F
+  
+  stat_smooth(aes(colour=gp),method="lm",
+              formula=y~x,size=1, lty = 2,  se = FALSE,
+              data = PV.all.last[envi.lm.F1,])+
+  
+  facet_wrap( ~ Group, scales="free_y", ncol = 3)+
+  
+  scale_colour_manual(values = c("#E31A1C", "#FB9A99","#FF7F00","#FDBF6F","#E5BA73",
+                                 "#DAE2B6", "#B2DF8A", "#6CC4A1",  "#43919B", "#1F78B4", 
+                                 "#F94A29", "#1F78B4", 
+                                 "#F94A29", "#1F78B4",
+                                 "#F94A29", "#1F78B4", 
+                                 "#F94A29", "#1F78B4", 
+                                 "#F94A29", "#1F78B4", 
+                                 "#F94A29", "#1F78B4"))+
+  
+  theme_bw()+ 
+
+  theme(legend.background=element_rect(colour="Black",size=0.5))+
+  theme(strip.background = element_blank())+
+  theme(axis.text.x  = element_text(vjust=0.5))+
+  theme(text = element_text(size = 12))+
+  theme( panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         axis.line = element_line(colour = "black"))+
+  theme(plot.title = element_text(hjust = 0.5,size = 12),
+        axis.text=element_text(size=12),
+        axis.title.x=element_text(size=12),
+        axis.title.y=element_text(size=12))+
+  xlab("Aridity")+ylab("")+
+  theme(legend.position = 'none')
+
+
+ggsave("../2.DX2013_145sites/figures/sactter.dot.plot.AGB.PLFA.EF.rich.soil.PV.rep5000.mean500row.pdf",
+       width = 6.5, height = 5)
+
+
