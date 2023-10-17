@@ -1,0 +1,39 @@
+﻿Name,gp,Variable,value
+Plant.div,DX,CV,0.69
+Plant.div,TP1,CV,0.71
+Plant.div,TP2,CV,0.66
+Plant.div,Global ,CV,0.701
+Micro.rich,DX,CV,0.69
+Micro.rich,TP1,CV,0.8
+Micro.rich,TP2,CV,0.75
+AGB,DX,CV,0.69
+AGB,TP1,CV,0.8
+AGB,TP2,CV,0.61
+AGB,IM,CV,0.767
+PLFA,DX,CV,0.69
+PLFA,TP2,CV,0.56
+Soil.pca1,DX,CV,0.69
+Soil.pca1,TP1,CV,0.68
+Soil.pca1,TP2,CV,0.69
+Soil.pca1,Global ,CV,0.739
+EF,DX,CV,0.69
+EF,TP1,CV,0.64
+EF,TP2,CV,0.67
+EF,Global ,CV,0.739
+Plant.div,DX,Asy,0.69
+Plant.div,TP1,Asy,0.58
+Plant.div,Global ,Asy,0.701
+Micro.rich,TP1,Asy,0.66
+Micro.rich,TP2,Asy,0.69
+AGB,DX,Asy,0.69
+AGB,TP1,Asy,0.58
+AGB,TP2,Asy,0.56
+AGB,IM,Asy,0.83
+AGB,Global ,Asy,0.739
+PLFA,DX,Asy,0.69
+PLFA,TP1,Asy,0.57
+Soil.pca1,DX,Asy,0.69
+Soil.pca1,TP1,Asy,0.54
+EF,DX,Asy,0.69
+EF,TP1,Asy,0.79
+EF,TP2,Asy,0.76
