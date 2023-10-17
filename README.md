@@ -1,2 +1,5 @@
-# Resilience
-This is a project about plant, soil and microbial links mediate the tipping point of alpine grasslands.
+# Plant, soil and microbial links mediate the tipping point of alpine grasslands
+Xiaoqin Yang1,2, Bin Niu1,2, Hongzhe Jiao1,2, Ya Yang3, Huiyuan Wang3, Guoqiang Huang3, Jianjun Wang4, Yue Li5, Xiang Chen1,2, Jian Sun1, Eryuan Liang1,*, Gengxin Zhang1,*, Shilong Piao1, Josep Peñuelas6,7
+1State Key Laboratory of Tibetan Plateau Earth System, Environment and Resources (TPESER), Institute of Tibetan Plateau Research, Chinese Academy of Sciences, Beijing 100101, China;  2University of Chinese Academy of Sciences, Beijing 100049, China; 3China University of Geosciences, Beijing 10008, China; 4State Key Laboratory of Lake Science and Environment, Nanjing Institute of Geography and Limnology, Chinese Academy of Sciences, Nanjing 210008, China; 5Shanghai Investigation, Design & Research Institute Co., Ltd., Shanghai 200335, China; 6CREAF, Cerdanyola del Valles, Barcelona 08193, Catalonia, Spain; 7CSIC, Global Ecology Unit CREAF-CSIC-UAB, Barcelona 08193, Catalonia, Spain.
+
+The codes used to generate the results reported in this study are available in the GitHub repository.
